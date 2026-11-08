@@ -1,14 +1,14 @@
 # CDCMS MVP Traceability Crosswalk and Issue Register
-## Review companion for MVP Requirements Specification v0.3
+## Working traceability companion for MVP Requirements Specification v0.3
 
 **Document ID:** CDCMS-MVP-TRACE-001  
 **Version:** 0.3  
 **Prepared:** 2026-11-05  
-**Status:** Review input only — not approved for adoption  
+**Status:** Approved for use as the working MVP traceability aid (owner approval: 2026-11-07; mapping review and evidence checks remain ongoing; see [Owner Approval Record](OWNER_APPROVAL_RECORD_2026-11-07.md))<br>
 **Baseline compared:** Requirements Baseline 0.1 as applied through CHG-001 and CHG-002
 
 > **Authority and change-control notice**  
-> This document is a working crosswalk for reviewing the proposed MVP specification. It does not amend the baseline, approve any open decision, add a source-register entry, or authorize CHG-003. Baseline identifiers retain their original meaning. Specification-only identifiers use separate namespaces: `MSPEC-FR-*`, `MSPEC-BR-*`, `MSPEC-NFR-*`, `DA-*`, and `TS-*`. This crosswalk is a reasoned mapping aid; the owner/team must review mappings and test evidence before adoption.
+> The project owner approved this v0.3 crosswalk on 2026-11-07 for use as the working MVP traceability aid. It does not amend Requirements Baseline 0.1 or approve any open institutional/technical decision, and it does not make every Proposed or Conditional item a mandatory requirement. Baseline identifiers retain their original meaning. Specification-only identifiers use separate namespaces: `MSPEC-FR-*`, `MSPEC-BR-*`, `MSPEC-NFR-*`, `DA-*`, and `TS-*`. This is a reasoned mapping aid, not a completed independent semantic verification; mapping review and test evidence checks continue during implementation.
 
 ## 1. Review scope and method
 
@@ -191,7 +191,7 @@ These scenarios supplement the MAC criteria. Conditional scenarios do not become
 | ISSUE-010 | 3-second performance target and accessibility expectations filled baseline unknowns. | NFR-013, NFR-015, NFR-016 | Removed invented targets; leave open. | Do not add targets without evidence/decision. |
 | ISSUE-011 | FR/BR/scenario rows were not mapped to baseline/MAC. | MVP-001…MVP-027; MAC-001…MAC-011 and requirement modules | Added row-level tables in §§4–7 of this crosswalk. | Team review still needed; this is not independent formal verification. |
 | ISSUE-012 | Actual school name appeared in draft despite publication/IP/naming unknown. | TD-020; TD-R17; AS-I01 | Use `Sample College`; no real institution name/logo/policy assertion in public-safe files. | Confirm institutional permission/rules before naming in public material. |
-| ISSUE-013 | External examples could be read as local policy; page-specific claims require verification. | External URLs in §2.4; source register currently through SRC-19 | Retained only as candidate background links. Exact page locators and source details are not claimed as reverified in v0.3. | Verify source content/page locators before relying on them; add a source row only through approved change. |
+| ISSUE-013 | External examples could be read as local policy; page-specific claims require verification. | External URLs in §2.4; source register was through SRC-19 when v0.3 was prepared | Retained only as candidate background links. Exact page locators and source details are not claimed as reverified in v0.3. SRC-20 was subsequently assigned to the local demo password decision, not to these examples. | Verify source content/page locators before relying on them; add a source row only when a source is checked and accepted as relevant. |
 | ISSUE-014 | Prior draft commentary about school website checks could be mistaken for verified evidence. | TD-R17; AS-I01; OF-I01… | v0.3 relies on no claim about the institution's website contents and makes no claim that a clearance form does or does not exist. | Record exact page/URL/date and scope if website evidence is gathered later; obtain official form/policy or authorized written answer for clearance rules. |
 | ISSUE-015 | Source IDs were tentatively reserved/assigned before an approved change. | `00-sources.md`; SRC-07 | No future source ID is assigned in v0.3. SRC-07 continues to cover AI-generated review input; any new source rows are allocated sequentially when explicitly approved and prepared. | Explicit owner approval and CHG entry before changing source register. |
 | ISSUE-016 | The existing original project brief is listed available but absent from applied archive. | SRC-01 | Crosswalk maps against the 18-file applied baseline; source completeness still limited by absent brief. | Locate authoritative brief before final traceability sign-off. |
@@ -202,15 +202,15 @@ These scenarios supplement the MAC criteria. Conditional scenarios do not become
 | ISSUE-021 | FR-009 cited MVP-026 as support, although it is an SIS exclusion. | MVP-003; MVP-016; MVP-017; MVP-026 | Corrected: MVP-003/MVP-016 give context; MVP-026 is labeled as boundary only. | No further action. |
 | ISSUE-022 | FR-021/BR-14/TS-15 relied on generic MVP-001/MVP-017 references for a duplicate-request safeguard. | MVP-001; MVP-017 | Removed those as supporting baseline references; duplicate detection remains an optional proposed safeguard with no direct baseline basis. | Owner/team can omit it from the MVP. |
 | ISSUE-023 | In-app progress counts/list filtering could be confused with MVP-023 report export. | MVP-019; MVP-023 | Separated list filtering and in-app display conveniences from report export; MVP-023 is stated as export only. | No export feature in current draft. |
-| ISSUE-024 | Tentative SRC-20/SRC-21 allocation introduced a source-ID gap before approval. | `00-sources.md`; SRC-07; current source sequence | Removed tentative source IDs; allocate next IDs sequentially only when the source-register change is actually approved/prepared. | Recheck the source register at the time of CHG preparation. |
+| ISSUE-024 | Tentative SRC-20/SRC-21 allocation introduced a source-ID gap in an earlier draft. | `00-sources.md`; SRC-07; source sequence at the time | The tentative allocations were removed from v0.3. SRC-20 was later assigned in the live source register to the owner's local demo password decision; SRC-21 remains unassigned. | Recheck the live source register before adding any new source; do not treat SRC-20 or SRC-21 as reserved for the external examples. |
 
 ## 10. Proposed external source handling (not yet source-register changes)
 
-This section does not assign or reserve source IDs and is not an instruction to edit `00-sources.md` now. If the owner later approves one or more sources for registration, allocate the next available IDs sequentially at that time, after rechecking the live source register:
+This section does not assign or reserve source IDs. The project owner adopted the v0.3 specification as the working MVP specification on 2026-11-07; that adoption does not make it a source that amends Requirements Baseline 0.1 and does not require an SRC row solely for the specification. If an external source is later verified and accepted as relevant for the baseline, allocate the next available ID at that time after checking the live source register:
 
 | Source-row status | Source bundle | Potential use | Limitation | Current treatment |
 |---|---|---|---|---|
-| No source ID assigned in this draft | `CDCMS-MVP-SPEC-001 v0.3` | The proposed specification itself, only if the owner later approves it as an authoritative project source. | It is not currently an approved baseline source. | Do not add until explicit approval. |
+| No source ID assigned | `CDCMS-MVP-SPEC-001 v0.3` | The owner-approved working MVP specification. | Its adoption as a working project reference does not amend or become part of Requirements Baseline 0.1. | No SRC row is needed solely because the specification was adopted as the working MVP reference. |
 | No source ID assigned in this draft | URS Academic Manual, CCP College Student Manual 2023, UPOU clearance page, UPM clearance page | Candidate background links illustrating that institutions may use different offices, purposes, and clearance steps. | Contents/page locators have not been reverified in this v0.3 correction pass; they do not establish a universal standard or `Sample College` policy. | Background only; verify details before adding a source row. |
 
 Source-specific notes:
@@ -246,17 +246,17 @@ Record the answer as an authoritative source or as unresolved if no clear answer
 - [ ] Ask instructor/registrar AW-I05 and record the answer with source/provenance.
 - [ ] Confirm `Sample College` is appropriate for public-safe documentation until naming permission is resolved.
 - [ ] Review every FR/BR/NFR/TS mapping; earlier spot-checks do not substitute for full owner/team review. Confirm FR-009 uses MVP-026 only as a boundary, FR-021/BR-14/TS-15 have no direct duplicate-policy baseline support, and in-app counters are not confused with MVP-023 report export.
-- [ ] Decide whether to add a source row for the specification or external examples only after approval; allocate all IDs sequentially when the change is prepared. Do not reserve any future source ID in advance.
-- [ ] Only after explicit approval, prepare CHG-003 with exact previous/new text and source-register updates if needed.
+- [ ] Add source-register rows only for external/institutional sources that have been obtained, checked, and accepted as relevant; allocate the next available ID when preparing that change. The v0.3 working-spec adoption does not itself require an SRC row. SRC-20 is already assigned to the local demo password decision.
+- [ ] Keep baseline amendments separate from working-MVP adoption. The existing CHG-003 entry in `docs/change-log.md` records the local demo password convention only and does not amend Requirements Baseline 0.1. Any future baseline amendment requires separate owner authorization and its own accurate change-control record.
 
 ## 13. Change-control statement
 
-No change to Requirements Baseline 0.1, `docs/decisions.md`, `docs/requirements/00-sources.md`, or `docs/change-log.md` is authorized by this review package. No CHG-003 is created or applied. `CDCMS-MVP-SPEC-001 v0.3` remains proposed review input, analogous in authority to the earlier AI-generated review material until accepted by the owner.
+The project owner approved this v0.3 crosswalk on 2026-11-07 for use as the working MVP traceability aid. Adoption does not change Requirements Baseline 0.1, resolve its open questions, or turn every Proposed/Conditional item into a mandatory requirement. CHG-003 in `docs/change-log.md` records only the local demo password convention (`test123`, SRC-20); it does not amend the baseline. The crosswalk remains a mapping aid, not independent formal verification, and its mappings/evidence must continue to be reviewed during implementation. No source-register row is required solely because the working MVP documents were adopted.
 
 | Version | Date | Summary | Status |
 |---|---|---|---|
-| 0.2 | 2026-11-05 | Initial namespace-separated crosswalk and issue register. | Review input; not approved. |
-| 0.3 | 2026-11-05 | Incorporated four main reviewer corrections and minor mapping/report/source-ID clarifications. | Review input; not approved. |
+| 0.2 | 2026-11-05 | Initial namespace-separated crosswalk and issue register. | Historical review input; superseded by v0.3. |
+| 0.3 | 2026-11-05 | Incorporated four main reviewer corrections and minor mapping/report/source-ID clarifications. | Approved by the project owner on 2026-11-07 for use as the working MVP traceability aid; mapping verification remains ongoing. |
 
 
 ## Appendix A. Row counts

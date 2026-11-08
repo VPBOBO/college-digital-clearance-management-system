@@ -1,19 +1,19 @@
 # College Digital Clearance Management System (CDCMS)
 
-> **Current-state note (2026-11-08):** The repository has since been made public at the owner's personal GitHub account. The full publication review was not completed before the first push. A limited follow-up scan/history cleanup is recorded in `../reviews/PUBLICATION_REVIEW_2026-11-08.md`; TD-020 and TD-R17 remain open. The steps below describe the original plan and should not be read as the current repository visibility.
+> **Current-state note (2026-11-08):** The repository is public under the project owner's personal GitHub account. The full TD-020 publication review was not completed before the first push. A limited follow-up scan and history cleanup are recorded in `../reviews/PUBLICATION_REVIEW_2026-11-08.md`; TD-020 and TD-R17 remain open and must be treated as post-publication remediation. Keep the repository limited to fictional/demo content until applicable school publication, ownership, and licensing rules are confirmed.
 
 ## MVP Scope Decision and Team Execution Plan
 
 **Document ID:** CDCMS-EXEC-001  
 **Version:** 0.3  
 **Prepared:** 2026-11-06  
-**Status:** Proposed working execution plan; requires team review  
+**Status:** Approved for use as the working MVP execution plan (owner approval: 2026-11-07; see [Owner Approval Record](../mvp/OWNER_APPROVAL_RECORD_2026-11-07.md)); team task coordination and unresolved decisions remain ongoing<br>
 **Project type:** Academic prototype / MVP  
 **Team size:** Three developers  
 **Public-safe institution label:** `Sample College`
 
 > **Authority and change notice**  
-> This plan uses the proposed MVP Requirements Specification v0.3 and its Traceability Crosswalk and Issue Register v0.3 as its only normative specification planning references. The optional final-sign-off variant v0.4 is set aside for this MVP and must not be used as an implementation source. It does not adopt those documents, amend Requirements Baseline 0.1, change `docs/decisions.md`, change `docs/requirements/00-sources.md`, change `docs/change-log.md`, or create or authorize CHG-003. Where this plan recommends a working direction, it is a planning recommendation for owner/team review—not evidence of institutional policy or approval by the college.
+> The project owner approved the MVP Requirements Specification v0.3, its Traceability Crosswalk and Issue Register v0.3, and this execution plan on 2026-11-07 for use as the working MVP foundation (see the Owner Approval Record). These documents are the current planning references for the project. Their adoption does not amend Requirements Baseline 0.1, resolve open baseline decisions, or turn every proposed behavior/demo assumption into confirmed institutional policy. The optional final-sign-off variant v0.4 is set aside for this MVP and must not be used as an implementation source. Where this plan labels a direction as a recommendation or leaves an item open/conditional, that qualification remains in force; this plan is not evidence of college approval.
 
 ---
 
@@ -200,9 +200,9 @@ These product stages retain the P0–P7 naming in the v0.3 specification. They d
 - Create `docs/README.md` as the overall documentation index (TD-021). Keep `docs/requirements/README.md` as the index/usage guide for the modular requirements baseline; do not create a duplicate documentation index or empty placeholder files.
 - Apply TD-016's established team convention: feature branches and pull requests for changes intended for `main`, with review by another team member. Decide separately whether to enforce the additional GitHub ruleset under TD-R16; do not describe that enforcement as established.
 
-**Exit evidence:** Repository ownership and publication status are recorded; the repository uses the exact TD-013 layout; TD-014 project separation is respected; `.gitignore`/`.gitattributes` are reviewed; M3 v1.1 results exist for all applicable checks on all three environments; the proposed Node-to-PostgreSQL probe is either run and recorded separately or explicitly left unverified/not adopted; TD-011 has an evidence-based disposition that does not overstate the checks; TD-R12/R13/R14/R15/R16/R17 statuses are accurately recorded; `docs/README.md` and `docs/development-progress.md` exist and are used; each teammate can clone the available working repository and build/start the relevant shell. Public visibility is confirmed only after TD-R17 and TD-020 release gates pass.
+**Exit evidence:** Repository ownership and publication status are accurately recorded; the repository uses the exact TD-013 layout; TD-014 project separation is respected; `.gitignore`/`.gitattributes` are reviewed; M3 v1.1 results exist for all applicable checks on all three environments; the proposed Node-to-PostgreSQL probe is either run and recorded separately or explicitly left unverified/not adopted; TD-011 has an evidence-based disposition that does not overstate the checks; TD-R12/R13/R14/R15/R16/R17 statuses are accurately recorded; `docs/README.md` and `docs/development-progress.md` exist and are used; each teammate can clone the repository and build/start the relevant project component. The repository is already public; the original TD-020/TD-R17 pre-publication gates were not completed before the first push and remain post-publication remediation items. Do not mark P1 complete until the remaining evidence and corrective review are recorded.
 
-**Gate rule:** If TD-R15 ownership or TD-R17/TD-020 publication approval is unresolved, public publication remains **Blocked**. The team may continue safe local/private development after the owner is selected, but it must not bypass the public-release gate. If a developer's machine fails a required M3 check, record the failure and arrange a compatible environment or revise the component assignment before marking the environment ready.
+**Publication gate — current treatment:** The repository is already public. The full TD-020 review and the school publication/ownership/licensing checks under TD-R17 were not completed before the first push, so the initial publication must not be described as having passed those gates. Keep the public repository limited to fictional/sample data and reviewed public-safe project materials. Do not add original clearance forms, internal school policies, interview notes, real student/staff information, or other institutional material until the applicable rules and permission are confirmed. Complete and record the remaining review as post-publication remediation. Long-term repository administration/succession under TD-R15 also remains to be settled. If a developer's machine fails a required M3 check, record the failure and arrange a compatible environment or revise the component assignment before marking the environment ready.
 
 ### P2 — Data model, permissions, authentication, and API contract
 

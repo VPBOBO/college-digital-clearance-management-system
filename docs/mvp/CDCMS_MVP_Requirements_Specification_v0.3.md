@@ -1,16 +1,16 @@
 # College Digital Clearance Management System (CDCMS)
-## MVP Requirements Specification — Generic, Configurable School-Project Draft
+## MVP Requirements Specification — Generic, Configurable School-Project MVP
 
 **Document ID:** CDCMS-MVP-SPEC-001  
 **Version:** 0.3  
 **Prepared:** 2026-11-05  
-**Status:** Revised review draft — not approved for adoption  
+**Status:** Approved for use as the working MVP specification (owner approval: 2026-11-07; see [Owner Approval Record](OWNER_APPROVAL_RECORD_2026-11-07.md))<br>
 **Project type:** Academic prototype / minimum viable product (MVP)  
 **Team size:** Three developers  
 **Institution label in this public-safe draft:** `Sample College`
 
 > **Authority notice**  
-> This document is a proposed specification derived from Requirements Baseline 0.1 as applied through CHG-001 and CHG-002. It does **not** amend, replace, or supersede that baseline. It does not authorize CHG-003, update the source register, or approve unresolved baseline decisions. The baseline identifiers remain authoritative. The `MSPEC-*`, `DA-*`, and `TS-*` identifiers belong only to this specification. Sample offices, sample student classifications, display labels, and demo settings are not verified institutional policy.
+> The project owner approved this v0.3 document on 2026-11-07 for use as the working MVP specification (see the Owner Approval Record linked above). This adoption does **not** amend, replace, or supersede Requirements Baseline 0.1, and it does not turn every proposed feature or demo assumption into a mandatory requirement or resolve open institutional and technical decisions. Baseline identifiers remain authoritative. The `MSPEC-*`, `DA-*`, and `TS-*` identifiers belong only to this specification. Sample offices, sample student classifications, display labels, and demo settings are not verified institutional policy.
 >
 > **Public-release notice**  
 > This version uses `Sample College` and fictional data. Do not insert a real institution's name, branding, official documents, staff names, or policy claims into public files until the applicable publication, intellectual-property, ownership, and naming rules have been checked under TD-020 and TD-R17.
@@ -56,7 +56,7 @@ The 12 essential feature areas remain those in MVP-002 through MVP-013: account/
 
 1. **Requirements Baseline 0.1 as applied through CHG-001 and CHG-002** — authoritative project requirements and unresolved-question register.
 2. **Owner-established project constraints and decisions** — authoritative only within their recorded scope.
-3. **This specification v0.3** — proposed elaboration for team review; not adopted.
+3. **This specification v0.3** — owner-approved on 2026-11-07 as the working MVP specification. Its individual Proposed, Conditional, Open, and Deferred items retain those qualifications; adoption is not blanket approval of every behavior.
 4. **Demo assumptions and fictional sample data** — temporary test scaffolding only.
 5. **External college/university examples** — background illustrations only; not evidence of `Sample College` policy.
 
@@ -66,7 +66,7 @@ The 12 essential feature areas remain those in MVP-002 through MVP-013: account/
 |---|---|
 | **Baseline-derived** | Directly organizes a topic already covered by a baseline requirement or acceptance criterion. The exact baseline ID is cited. |
 | **Owner-established** | A project decision supplied by the owner and recorded in the applied baseline/decision pack. |
-| **Proposed** | Product behavior suggested to make the prototype coherent; needs owner/team approval and must not contradict an open baseline item. |
+| **Proposed** | Product behavior suggested to make the prototype coherent; remains subject to owner/team review where marked Proposed and must not contradict an open baseline item. Adoption of v0.3 as the working foundation does not blanket-approve every proposed behavior. |
 | **Demo assumption** | Fictional setting or test fixture used only to demonstrate a flow. It is replaceable and not a statement about institutional practice. |
 | **Conditional** | Implement only if the linked baseline question is answered in a way that requires it and the owner/team approves the resulting scope. |
 | **Open** | Unresolved in the baseline. This specification does not decide it. |
@@ -781,21 +781,21 @@ The following are not resolved by this document:
 
 # 20. Change control and revision history
 
-This document remains a proposed specification. Do not modify Requirements Baseline 0.1 merely to align it with this draft. The four reviewer corrections and related minor traceability clarifications below are proposed changes for owner review, not approved decisions.
+The project owner approved this v0.3 specification on 2026-11-07 for use as the working MVP foundation. This adoption does not amend Requirements Baseline 0.1, resolve open institutional or technical questions, or convert every Proposed, Conditional, Open, or Deferred item into an approved requirement. Do not modify the baseline merely to align it with this specification.
 
-Before adoption:
+For implementation and ongoing review:
 
 1. Review the companion Traceability Crosswalk and Issue Register.
 2. Obtain instructor/registrar clarification for AW-I05 and resolve other blockers that affect the first integrated slice.
 3. Decide which demo assumptions the owner/team explicitly accepts as prototype-only behavior.
 4. Resolve dependencies on TD-R01, TD-R09, and the relevant data/role questions before finalizing authentication or physical schema.
 5. Verify each mapping and scenario with the team; the crosswalk is a working traceability aid, not an independent formal verification report.
-6. If adoption is approved, allocate any required source-register ID(s) sequentially at the time the source-register change is prepared, then prepare CHG-003 with exact old/new text for any baseline changes. Do not reserve or preassign source IDs in advance. The current v0.3 document itself does not authorize those actions.
+6. Any future amendment to Requirements Baseline 0.1 must be separately authorized and recorded through the baseline's change-control process, with the exact previous and new text. The existing CHG-003 entry in `docs/change-log.md` records the local demo password convention (`test123`, SRC-20) only; it does not amend the baseline. Add source-register rows for other sources only when they have been obtained, checked, and accepted as relevant, and allocate the next available ID at that time. Do not reserve or preassign source IDs.
 
 | Version | Date | Summary | Status |
 |---|---|---|---|
-| 0.1 | 2026-11-05 | Initial generic, configurable working specification. | Superseded as review draft only; not adopted. |
-| 0.2 | 2026-11-05 | Separated identifier namespaces; qualified roles; removed default final sign-off, mandatory rejection remark, reopening, cancellation, and snapshot prescription; added configurable reject remark; renamed product stages; added baseline traceability companion. | Revised review draft; not approved. |
-| 0.3 | 2026-11-05 | Added demo-only completion condition DA-11; made TS-10 a seeded-fixture backend/database test; scoped reject-remark setting to each TemplateRequirement; clarified UNSPECIFIED/OPTIONAL semantics; downgraded applicability preview to Should; corrected minor traceability, reporting, and source-ID wording. | Revised review draft; not approved. |
+| 0.1 | 2026-11-05 | Initial generic, configurable working specification. | Superseded by later revisions; not separately adopted. |
+| 0.2 | 2026-11-05 | Separated identifier namespaces; qualified roles; removed default final sign-off, mandatory rejection remark, reopening, cancellation, and snapshot prescription; added configurable reject remark; renamed product stages; added baseline traceability companion. | Historical review draft; superseded by v0.3. |
+| 0.3 | 2026-11-05 | Added demo-only completion condition DA-11; made TS-10 a seeded-fixture backend/database test; scoped reject-remark setting to each TemplateRequirement; clarified UNSPECIFIED/OPTIONAL semantics; downgraded applicability preview to Should; corrected minor traceability, reporting, and source-ID wording. | Approved by the project owner on 2026-11-07 for use as the working MVP specification; individual qualifications and open decisions remain in force. |
 
 **End of document.**
