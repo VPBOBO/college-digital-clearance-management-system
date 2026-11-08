@@ -1,0 +1,53 @@
+# Ignore rules for local development and generated artifacts.
+
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+!.env.sample
+.envrc
+.npmrc
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+credentials.json
+service-account*.json
+
+# JavaScript dependencies, logs, and build outputs
+node_modules/
+dist/
+coverage/
+.npm/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Android / Gradle local state and build output
+android/.cache/
+.gradle/
+**/build/
+local.properties
+*.iml
+
+# Eclipse / Buildship / Java language-server metadata (machine-specific)
+.project
+.classpath
+.settings/
+bin/
+
+# IDE and editor local state
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+Desktop.ini

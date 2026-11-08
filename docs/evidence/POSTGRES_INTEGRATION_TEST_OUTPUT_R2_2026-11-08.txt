@@ -1,0 +1,37 @@
+Source configuration checked: cdcms_dev.
+Integration target: cdcms_test.
+Database owner: cdcms_app.
+Starting integration tests...
+
+> cdcms-backend@0.1.0 test:integration
+> node --test test/integration.test.js
+
+✔ FS-01 authenticates and does not return password hash (502.928461ms)
+✔ FS-02 backend assignment applies program-specific requirements (177.35902ms)
+✔ FS-02 assignment rejects a template with zero applicable mandatory requirements (230.04556ms)
+✔ FS-03 review queue defaults to Pending and supports status filtering (224.920187ms)
+✔ FS-03B Reviewer B cannot see Office A items and detail access is scoped (197.007501ms)
+✔ FS-04 authorized reviewer can retrieve a Pending review item (216.031592ms)
+✔ FS-05 missing and whitespace-only REQUIRED remark returns 422; OPTIONAL permits omission (275.940884ms)
+✔ FS-06 wrong office assignment and wrong role return 403 (405.843088ms)
+✔ FS-07 decision and history contain matching actor and status fields (223.090812ms)
+✔ FS-08 another student receives the identical 404 body as an unknown request (238.67158ms)
+✔ FS-09 completion is derived from persisted mandatory requirement status (249.259758ms)
+✔ FS-11 a second decision returns 409 before remark validation (238.151027ms)
+✔ FS-13 two parallel decisions produce exactly one success and one conflict (260.989759ms)
+✔ FS-14 unauthenticated protected request returns 401 (166.508943ms)
+Unhandled API error: P0001
+✔ FS-15 history insert failure rolls back the requirement update (212.620122ms)
+Unhandled API error: P0001
+✔ FS-15 status update failure cannot create a history event (215.328718ms)
+✔ FS-16 concurrent duplicate assignment creates one request only (159.647693ms)
+✔ history is append-only and request deletion cannot cascade away records/history (246.061206ms)
+✔ FS-17 inactive office staff assignment is denied (291.576767ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4918.455373
