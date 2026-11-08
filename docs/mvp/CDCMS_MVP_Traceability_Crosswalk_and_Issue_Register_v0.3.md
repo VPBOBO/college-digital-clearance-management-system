@@ -157,7 +157,7 @@ These scenarios supplement the MAC criteria. Conditional scenarios do not become
 |TS-15|Duplicate request detection|— (no direct supporting baseline requirement)|MAC-011 supporting only|Optional demo safeguard; not an institutional policy.|
 |TS-16|Overall display labels are derived|AW-002, AW-004, AW-007|MAC-008, MAC-009|Labels not treated as canonical baseline status values.|
 |TS-17|Cross-client/backend/DB consistency|AW-008, NFR-010, MVP-014|MAC-007, MAC-008, MAC-011|Compare persisted result and both client displays.|
-|TS-18|Public repository safety review|MVP-015, TD-020, TD-R17, NFR-007/NFR-008|MAC-001/MAC-011 supporting only|Release gate; repository is not claimed published or reviewed.|
+|TS-18|Public repository safety review|MVP-015, TD-020, TD-R17, NFR-007/NFR-008|MAC-001/MAC-011 supporting only|Repository is public. A limited history/file scan and first-commit cleanup are recorded; full TD-020 review and TD-R17 school-rule checks remain open.|
 
 ## 8. MAC coverage summary
 

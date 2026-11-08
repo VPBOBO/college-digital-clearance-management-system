@@ -21,6 +21,18 @@ Rules: IDs are never reused. When a requirement is removed, its row is deleted f
 
 ## Entries
 
+### CHG-003 · 2026-11-08 · Choose a simple password for fictional local demo accounts
+- Changed information: local demo account credential convention and its supporting documentation; no baseline requirement or institutional policy changed.
+- Previous value: the example configuration used the earlier documented demo password, and the reset utility required at least 12 characters.
+- New value: the owner selected `test123` as the shared public password for the five fictional local demo accounts; the example configuration uses it, and the guarded reset utility accepts it with a seven-character minimum.
+- Reason: make local classroom demonstrations and testing easier for classmates.
+- Source: SRC-20.
+- Affected components: demo seed configuration, guarded password-reset utility, setup guides, and decision records.
+- Implementation consequences: fresh local demo accounts use `test123`; existing accounts keep their current passwords until the guarded local reset is deliberately run. Loopback, development-mode, `_dev` database, and LAN-disabled safeguards remain in place. This value is not for real accounts or hosted/production use.
+- Documents updated: `backend/.env.example`; `backend/src/demo-password-reset.js`; `backend/test/demo-password-reset.test.js`; root and component READMEs; `SETUP-WINDOWS.md`; `HOW-TO-USE.md`; `TESTING.md`; `TROUBLESHOOTING.md`; `docs/decisions.md`; `docs/requirements/00-sources.md`; `docs/implementation/First-Slice_Technical_Contract_Draft_0.3.md`.
+- Checklist updated: not applicable; Requirements Baseline 0.1 is not amended.
+
+
 ### CHG-002 · 2026-11-05 · Protect original clearance forms and interview records from public publication
 - Changed information: Step 0 in `docs/requirements/form-integration-checklist.md`.
 - Previous value: `Add the form to [00-sources.md](00-sources.md) (change SRC-FORM from "NOT YET AVAILABLE" to available, with date and who provided it). Keep a copy of the form with the project records, with any real student data removed.`

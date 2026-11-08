@@ -1,4 +1,7 @@
 # College Digital Clearance Management System (CDCMS)
+
+> **Current-state note (2026-11-08):** The repository has since been made public at the owner's personal GitHub account. The full publication review was not completed before the first push. A limited follow-up scan/history cleanup is recorded in `../reviews/PUBLICATION_REVIEW_2026-11-08.md`; TD-020 and TD-R17 remain open. The steps below describe the original plan and should not be read as the current repository visibility.
+
 ## MVP Scope Decision and Team Execution Plan
 
 **Document ID:** CDCMS-EXEC-001  

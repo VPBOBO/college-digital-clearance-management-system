@@ -4,22 +4,24 @@
 **Project workspace:** Owner's Ubuntu machine  
 **Evidence basis:** Owner-supplied terminal output, owner-reported interactive checks, and supplied screenshot. The package creator did not execute commands against the owner's workstation or PostgreSQL instance. The dependency-free unit suite and JavaScript syntax checks were rerun against the extracted source copy in an isolated package workspace (Node.js 22.16.0).
 
+After the reset-password validator was changed to accept the local demo password `test123`, the owner reran `npm test` on the Ubuntu project machine. The supplied terminal output reports 28 passed, 0 failed, and 0 skipped. This successful owner-machine run supersedes the incomplete test attempt in the separate packaging environment, where `npm ci` timed out and `argon2` could not be imported. The full 28-test output has not been saved as a separate repository evidence file.
+
 This is the current first-slice implementation status. The separate [`BUILD_AND_TEST_STATUS_2026-11-07.md`](BUILD_AND_TEST_STATUS_2026-11-07.md) remains as a historical build-container snapshot and must not be mistaken for the current owner-machine result.
 
 ## 1. Current verification summary
 
 | Area | Result | Evidence class and qualification |
 |---|---|---|
-| Backend unit tests (`npm test`) | **PASS — 28 passed, 0 failed, 0 skipped** | Owner supplied terminal output after password-reset and seed-hashing changes. |
-| PostgreSQL integration suite (`npm run test:integration`) | **PASS — 19 passed, 0 failed, 0 skipped** | Latest output saved in `docs/evidence/POSTGRES_INTEGRATION_TEST_OUTPUT_2026-11-08_AFTER_PASSWORD_CHANGES.txt`; target `cdcms_test`. |
+| Backend unit tests (`npm test`) | **PASS — 28 passed, 0 failed, 0 skipped** | Owner supplied terminal output after the `test123` validation adjustment on 2026-11-08. The full output is not saved as a separate evidence file. |
+| PostgreSQL integration suite (`npm run test:integration`) | **PASS — latest owner rerun: 19 passed, 0 failed, 0 skipped** | Owner supplied terminal output after the `test123` validation update on 2026-11-08; latest output is not saved separately. Target: `cdcms_test`. An earlier run is saved in `docs/evidence/POSTGRES_INTEGRATION_TEST_OUTPUT_2026-11-08_AFTER_PASSWORD_CHANGES.txt`. |
 | Integration history protection | **PASS** | The formerly failing append-only/deletion test passed after its assertions were corrected to check the two `RESTRICT` foreign keys and SQLSTATE `23001`. |
 | Web production build (`npm run build`) | **PASS** | Owner supplied Vite 8.3.6 output: 17 modules transformed, 210 ms. |
 | Web production preview | **PASS — owner-reported** | Owner reported the preview page loaded after `WEB_ORIGINS` included `http://127.0.0.1:4173` and the backend was restarted. |
-| Reviewer A sign-in and filters | **PASS — owner-reported** | Owner reported sign-in and expected Approved/All content; Pending and Rejected views were empty for that reviewer. |
-| Reviewer B sign-in and filters | **PASS — screenshot-supported / owner-reported** | Supplied screenshot shows `reviewer-b`, `All`, the Office B sample item as Rejected, and no Office A item. Owner reported Pending and Approved empty and Rejected/All showing the expected sample. |
+| Reviewer A sign-in and filters | **PASS — owner-reported** | After the password reset, the owner confirmed reviewer A signed in and saw its expected office-specific sample records. Earlier filter checks are recorded below. |
+| Reviewer B sign-in and filters | **PASS — screenshot-supported / owner-reported** | After the password reset, the owner confirmed reviewer B signed in and saw its expected office-specific sample records. The supplied screenshot also shows the earlier `All` filter result with the Office B sample item and no Office A item. |
 | Reviewer office isolation | **PASS** | Integration test `FS-03B` verifies reviewer B's list contains only Office B and detail access to Office A returns 404; supplied screenshot supports the production UI list behavior. |
 | Android Gradle debug build | **PASS — R2 rebuild** | Owner supplied `BUILD SUCCESSFUL` output: Java 17, Gradle 8.9, 32 tasks, 16 seconds. |
-| Android APK installation and sign-in | **PASS — owner-reported** | Prior owner report says APK installed on physical phone, backend health endpoint reached through ADB reverse, student sign-in worked, and clearance screen loaded. |
+| Android APK installation and sign-in | **PASS — owner-reported** | After the password reset, the owner reports that both `student-a` and `student-b` signed in on a physical Android phone and displayed their own sample records. ADB reverse was configured and the phone reached the backend health endpoint. |
 | Reviewer-to-student status refresh | **PASS — owner-reported, with database evidence** | Owner reported that after reviewer A approved the Office A item, refreshing the student app displayed Approved. The supplied SQL output contains `Pending → Approved` by `reviewer-a`; it does not identify the requirement/record ID, so the link between the UI item and exact history row is not independently demonstrated in this report. |
 | Processing history query | **PASS — terminal output supplied** | Record 1: DEMO-STU-001 / REQ-A / Office A / Approved by reviewer-a. Record 2: DEMO-STU-002 / REQ-B / Office B / Rejected by reviewer-b. |
 | Gradle wrapper JAR checksum | **MATCH** | SHA-256 calculated from the uploaded source archive: `498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17`. It matches Gradle's official Gradle 8.9 wrapper JAR value at <https://gradle.org/release-checksums/>. |
@@ -57,7 +59,7 @@ The authentication tests exercise `createAuthMiddleware(pool)` with a fake pool;
 
 ## 3. PostgreSQL integration-test details
 
-**Latest working-tree update (2026-11-08):** After the demo-password and seed-hashing changes, the owner reran the integration suite against `cdcms_test`. The result was 19 passed, 0 failed, 0 skipped. The saved terminal output is `docs/evidence/POSTGRES_INTEGRATION_TEST_OUTPUT_2026-11-08_AFTER_PASSWORD_CHANGES.txt`.
+**Earlier saved owner-machine run (2026-11-08):** After the demo-password and seed-hashing changes, the owner ran the integration suite against `cdcms_test`; the result was 19 passed, 0 failed, 0 skipped. Its saved output is `docs/evidence/POSTGRES_INTEGRATION_TEST_OUTPUT_2026-11-08_AFTER_PASSWORD_CHANGES.txt`. The owner later reran the suite after the reset-password validator was changed to accept `test123`; that latest result is recorded in the summary table above. The latest console output was supplied in the project conversation but is not saved as a separate file.
 
 The launcher confirmed `cdcms_dev` as the source configuration, `cdcms_test` as the integration target, and `cdcms_app` as the database role. The suite reset only the dedicated test database. Two expected `P0001` fault-injection messages appeared; both rollback tests passed.
 
@@ -100,7 +102,7 @@ adb -s DEVICE_SERIAL reverse tcp:3000 tcp:3000
 
 The Android app uses `http://localhost:3000`; the backend remains bound to `127.0.0.1:3000`. The ADB wireless-debugging serial/port may change after sleep/reconnect, so developers must inspect `adb devices` and use the current serial.
 
-The owner reported successful Android login and that the student's Office A status changed to Approved after refreshing. In this re-package, a cookie-count diagnostic was removed from the Android sign-in failure message; the previously reported Gradle build predates that text-only source cleanup, so rerun `./gradlew assembleDebug` before treating this exact package revision as rebuilt. The supplied history query supports an approval event attributed to `reviewer-a`, but does not include the requirement record identifier. Capture and retain matching before/after phone screenshots and a query that includes the `requirement_record_id` when collecting a stronger trace for FS-12/MAC-008.
+After the password reset, the owner reports that `student-a` and `student-b` both signed in successfully on the physical Android phone and displayed their own sample records. The phone reached the backend through ADB reverse while the API remained bound to loopback. The owner also reports that the student status refresh worked after an office review. The previously supplied history query does not include the requirement record identifier, so a matching before/after screenshot and history row with `requirement_record_id` would provide a stronger trace for FS-12/MAC-008.
 
 ## 5. Gradle checksum note
 
@@ -119,7 +121,7 @@ These five issues from the v0.1.1 review remain in the follow-up register and ar
 
 | Finding | Current disposition |
 |---|---|
-| A failed seed can lose the generated password. | Open; inspect and define recovery behavior. |
+| If `SEED_PASSWORD` is blank, a failed seed may lose the generated password printed only once. | The checked-in `.env.example` now supplies the fixed local demo password `test123`; this concern applies only when a developer removes that value and uses random generation. |
 | `.env.example` pre-sets `ALLOW_*` flags to `YES`. | Confirmed in uploaded template; review whether the example should default to `NO` and require deliberate opt-in. |
 | Dummy hash is created lazily. | Confirmed in current `auth.js` (`WeakMap` cache populated on first need); evaluate first unknown-user login latency and initialization choice. |
 | Staff detail route returns 404 for another office's item while decision route returns 403. | 404/403 behavior is present in current code/tests; the detail route is now listed in the technical contract, and the disclosure difference remains a policy decision to resolve before production. |
@@ -140,12 +142,11 @@ The package manifest and SHA-256 inventory were regenerated after these changes.
 ## 8. Remaining work
 
 1. Capture matching before/after Android screenshots and a history query including the relevant requirement record ID to strengthen the FS-12/MAC-008 end-to-end trace.
-2. Run clean `npm ci` in both backend and web from a fresh extraction/clone and record the results.
-3. Complete Windows checks and the full M3 v1.1 evidence/review process.
-4. Complete TD-011 stack suitability evaluation, not just component compatibility checks.
-5. Obtain teammate review and maintain the FS/MAC traceability evidence.
-6. Resolve TD-R01, TD-R11, TD-R12, TD-R14, TD-R15, and TD-R17 as applicable; do not treat pilot selections as permanent decisions.
-7. Before public GitHub publication, review school rules, ownership/licensing, all files, secrets and the full reachable Git history. The supplied source ZIP intentionally omits `.git` history and does not create a remote repository.
+2. Complete Windows checks and the full M3 v1.1 evidence/review process, including a fresh clone, clean dependency installation, and sign-in.
+3. Complete TD-011 stack suitability evaluation, not just component compatibility checks.
+4. Obtain teammate review and maintain the FS/MAC traceability evidence.
+5. Resolve TD-R01, TD-R11, TD-R12, TD-R14, TD-R15, and TD-R17 as applicable; do not treat pilot selections as permanent decisions.
+6. Complete the remaining TD-020 review after publication. The limited 2026-11-08 scan and history cleanup are recorded in `docs/reviews/PUBLICATION_REVIEW_2026-11-08.md`; school rules, complete file/history review, and GitHub settings/metadata remain open.
 
 ## 9. Completion statement
 

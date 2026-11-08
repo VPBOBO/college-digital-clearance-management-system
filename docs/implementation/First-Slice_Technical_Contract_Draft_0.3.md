@@ -7,6 +7,9 @@
 
 > This contract is an implementation aid. It does not amend the baseline, approve unresolved baseline questions, or authorize public release. The MVP documents have been adopted by the project owner as the working MVP foundation. The first-slice contract remains a draft, and the review clarifications in `../reviews/First-Slice_Contract_Review_Clarifications.md` remain pending owner disposition.
 
+
+> **Current-state note (2026-11-08):** This draft was written before the repository was made public. The repository is now public; the full TD-020 review was not completed before the first push. A limited follow-up review and history cleanup are recorded in `../reviews/PUBLICATION_REVIEW_2026-11-08.md`. TD-020 and TD-R17 remain open.
+
 ## 1. Purpose and boundary
 
 The first slice is a small, integrated office-clearance workflow using fictional data. It proves that the backend can assign applicable requirements, enforce reviewer authorization, record an office decision and history, derive completion, and provide the student's own status to Android.
@@ -35,7 +38,7 @@ Seed prerequisite records for:
 
 Expected assignment: Student A receives Requirement A only; Student B receives Requirement B only. Office Staff A can process Office A items, not Office B items, and vice versa.
 
-Seed accounts must use fictional local-only passwords. Generate Argon2id hashes at seed time. Never commit real/reused credentials, locally generated secrets, or reusable demo password hashes. Keep local secret files out of Git.
+Seed accounts use fictional local-only passwords. The project owner selected `test123` as the shared password for the five fictional demo accounts to make classroom testing easier (SRC-20). This value is public and for local development only; never use it for personal accounts, real students, hosted environments, or production. Generate independent Argon2id hashes for each account at seed/reset time. Never commit real credentials, password hashes, or private local secrets. Keep `backend/.env` out of Git.
 
 ## 3. Minimum logical data model
 
