@@ -110,7 +110,7 @@ The following details were supplied in an earlier conversation/terminal report. 
 
 | Item | Earlier reported observation | M3 treatment |
 |---|---|---|
-| Ubuntu machine | Ubuntu development machine; personal hardware and storage details are not included here. | Reported; rerun checks privately. |
+| Ubuntu machine | Ubuntu development machine; personal hardware and storage details are not included here | Reported; rerun checks privately. |
 | Node.js | NVM 0.40.7; Node.js 26.13.0 selected; npm 11.20.0; a basic Node REPL smoke test succeeded | Reported; rerun version and runtime checks. Does not prove Vite, Express, or Argon2 compatibility. |
 | PostgreSQL | PostgreSQL 18.6; cluster `18/main` online; `pg_isready` accepted a local connection; `sudo -u postgres psql` worked | Reported; rerun client/server readiness and connection checks. |
 | Git | Git 2.53.0 | Reported; rerun `git --version` and configuration checks. |

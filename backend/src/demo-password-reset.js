@@ -16,8 +16,8 @@ const LOOPBACK_HOSTS = new Set([
 ]);
 
 export function validateDemoPassword(password) {
-  if (typeof password !== 'string' || [...password].length < 12) {
-    throw new Error('SEED_PASSWORD must contain at least 12 characters.');
+  if (typeof password !== 'string' || [...password].length < 7) {
+    throw new Error('SEED_PASSWORD must contain at least 7 characters.');
   }
 
   return password;

@@ -85,17 +85,14 @@ test('rejects explicitly enabled LAN access', () => {
   );
 });
 
-test('accepts the proposed memorable demo password', () => {
-  assert.equal(
-    validateDemoPassword('CDCMS-Demo-2026!'),
-    'CDCMS-Demo-2026!'
-  );
+test('accepts the simple local demo password', () => {
+  assert.equal(validateDemoPassword('test123'), 'test123');
 });
 
-test('rejects missing and short demo passwords', () => {
-  assert.throws(() => validateDemoPassword(''), /at least 12 characters/);
-  assert.throws(() => validateDemoPassword(undefined), /at least 12 characters/);
-  assert.throws(() => validateDemoPassword('short'), /at least 12 characters/);
+test('rejects missing and too-short demo passwords', () => {
+  assert.throws(() => validateDemoPassword(''), /at least 7 characters/);
+  assert.throws(() => validateDemoPassword(undefined), /at least 7 characters/);
+  assert.throws(() => validateDemoPassword('short'), /at least 7 characters/);
 });
 
 test('only the five designated fictional accounts are eligible', () => {
@@ -114,7 +111,7 @@ test('generates independently salted hashes for the same demo password', async (
   const hashes = [];
 
   for (let index = 0; index < 5; index += 1) {
-    hashes.push(await createDemoPasswordHash('CDCMS-Demo-2026!'));
+    hashes.push(await createDemoPasswordHash('test123'));
   }
 
   assert.equal(new Set(hashes).size, 5);
@@ -123,7 +120,7 @@ test('generates independently salted hashes for the same demo password', async (
     assert.equal(
       await (await import('argon2')).default.verify(
         hash,
-        'CDCMS-Demo-2026!'
+        'test123'
       ),
       true
     );
