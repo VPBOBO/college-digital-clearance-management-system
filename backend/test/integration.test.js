@@ -392,4 +392,48 @@ if (!TEST_DATABASE_URL) {
     const response = await decision(cookie,ids.recordA,'Approved');
     assert.equal(response.status,403);
   });
+
+  test('AUTH-04 expired session is rejected on the next authenticated request', async () => {
+    const cookie = await login('student-a');
+    assert.ok(cookie.startsWith('cdcms.sid='));
+
+    const token = decodeURIComponent(cookie.slice('cdcms.sid='.length));
+    const digest = crypto.createHash('sha256').update(token).digest('hex');
+
+    const updated = await pool.query(
+      "UPDATE app_sessions SET expires_at=NOW()-INTERVAL '1 minute' WHERE token_hash=$1",
+      [digest]
+    );
+    assert.equal(updated.rowCount, 1);
+
+    const response = await fetch(`${baseUrl}/api/me`, { headers: { cookie } });
+    assert.equal(response.status, 401);
+  });
+
+  test('AUTH-05 logout invalidates the session and clears the cookie', async () => {
+    const cookie = await login('student-a');
+
+    const logout = await fetch(`${baseUrl}/api/auth/logout`, {
+      method: 'POST',
+      headers: { cookie }
+    });
+
+    assert.equal(logout.status, 200);
+    assert.match(logout.headers.get('set-cookie') ?? '', /Max-Age=0/i);
+
+    const replay = await fetch(`${baseUrl}/api/me`, { headers: { cookie } });
+    assert.equal(replay.status, 401);
+  });
+
+  test('AUTH-06 inactive account cannot use an existing session', async () => {
+    const cookie = await login('student-a');
+
+    await pool.query(
+      'UPDATE user_accounts SET is_active=FALSE WHERE id=$1',
+      [ids['student-a']]
+    );
+
+    const response = await fetch(`${baseUrl}/api/me`, { headers: { cookie } });
+    assert.equal(response.status, 401);
+  });
 }

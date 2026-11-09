@@ -1,12 +1,12 @@
 # CDCMS P2 Technical Design and Decision Package
 
 **Document ID:** CDCMS-P2-DESIGN-001<br>
-**Version:** 0.1<br>
+**Version:** 0.2<br>
 **Prepared:** 2026-11-09<br>
-**Status:** Draft recommendation for owner/team review; non-authoritative (reviewed for consistency before first commit)<br>
+**Status:** Working technical design reference; TD-R01 is owner-established for the academic MVP; remaining P2 items retain their recorded open or provisional status.<br>
 **Scope:** P2 data model, permissions, authentication, API contract and history design
 
-> **Authority notice:** This document is a technical planning aid. It does not amend Requirements Baseline 0.1, replace the owner-approved MVP Specification v0.3, approve an unresolved institutional question, or establish TD-R01, TD-R07, TD-R09, or any other technical decision. Recommendations remain proposals until separately accepted and recorded in `docs/decisions.md`. The implementation team retains ownership of production code.
+> **Authority notice:** This document is a technical planning aid. It does not amend Requirements Baseline 0.1 or replace the owner-approved MVP Specification v0.3. TD-R01 is established separately by the project owner and recorded in `docs/decisions.md`. This document does not establish TD-R07, TD-R09, or any other remaining open or provisional decision. The implementation team retains ownership of production code.
 
 ---
 
@@ -59,9 +59,9 @@ The following describes the current repository snapshot reviewed for this packag
 
 ## 3. TD-R01 — Authentication mechanism shared by web and Android
 
-**Current decision-register status:** OPEN / UNKNOWN / UNDECIDED.<br>
-**Recommended direction:** Retain opaque, server-managed sessions for the academic MVP, subject to the verification checks in §3.4.<br>
-**Owner approval:** Not yet recorded.
+**Current decision-register status:** ESTABLISHED / CONFIRMED / REQUIRED (owner-approved 2026-11-09; see `docs/decisions.md` and CHG-004).<br>
+**Selected approach:** Opaque, server-managed sessions shared by the web and Android clients for the academic MVP.<br>
+**Owner approval:** Recorded on 2026-11-09 in `docs/decisions.md` and CHG-004.
 
 ### 3.1 The problem in plain language
 
@@ -82,7 +82,7 @@ The project needs one understandable approach that works with the existing brows
 | Current implementation impact | Retains the working pilot architecture. | Replaces/reworks authentication and both-client integration. |
 | Added complexity for current MVP | Low; verification and documentation remain. | Higher; token issue/expiry/refresh/revocation behavior must be added. |
 
-### 3.3 Recommendation
+### 3.3 Selected approach
 
 Retain the current opaque server-managed session approach for the current academic MVP:
 
@@ -95,9 +95,11 @@ Retain the current opaque server-managed session approach for the current academ
 7. Logout deletes the server-side session and clears the client cookie.
 8. Argon2id remains the independent password-hashing choice under TD-006.
 
-This recommendation is based on the fact that the working browser and Android clients already use this design. It avoids adding token-refresh and revocation machinery solely to change authentication terminology.
+This approach was selected because the working web and Android pilot already use it. Retaining it avoids unnecessary token-refresh, revocation and client-migration work for the academic MVP. Keep the existing implementation where it works; correct only demonstrated problems that prevent the approved workflow from working.
 
-### 3.4 Verification and acceptance checks before finalizing TD-R01
+### 3.4 Functional verification of the selected approach
+
+The owner decision is established. These checks verify that the existing implementation works as intended; they are not a gate for selecting sessions. Prioritize sign-in, authenticated requests, logout, expiry and current authorization. Do not add an authentication framework, token-refresh flow or optional hardening unless a specific MVP failure demonstrates the need.
 
 | ID | Check | Expected result |
 |---|---|---|
@@ -108,19 +110,34 @@ This recommendation is based on the fact that the working browser and Android cl
 | AUTH-05 | Logout | Logout deletes the session; replaying the previous cookie no longer authenticates. |
 | AUTH-06 | Disabled account | An account made inactive cannot use an existing session on the next protected request. |
 | AUTH-07 | Role/assignment change | Inactive role or office/instructor assignment prevents subsequent protected actions according to the policy. |
-| AUTH-08 | Browser origin/cookie behavior | Approved browser origins work; unapproved origins are rejected; cookie attributes are correct for development and the intended demo deployment. |
-| AUTH-09 | Android restart/expiry | Android retains the session only as intended; expiry is handled clearly; the user can sign in again. |
+| AUTH-08 | Browser session behavior | The browser can sign in, send its session cookie, and remain authenticated on subsequent API requests from the configured demo application. |
+| AUTH-09 | Android restart/expiry | The app returns to sign-in after a process restart because the session cookie is held in memory; the student can sign in again. Backend session expiry remains enforced. |
 | AUTH-10 | Session cleanup | The current login path purges expired rows using `purgeExpiredSessions`; verify that cleanup behavior and frequency are suitable. Expiry is independently checked on authenticated requests, so cleanup is housekeeping rather than an access-control mechanism. |
 
-**Security qualification:** The current app uses SameSite=Lax and an allowed-origin check for browser requests. Before accepting this as the complete CSRF approach, verify unsafe browser requests, deployment origins and cookie behavior. Do not add a CSRF library automatically; assess the actual flow under TD-010 and record why an additional mechanism is or is not needed.
+**Verification snapshot (2026-11-09):** The owner ran 28/28 backend unit
+tests and 22/22 PostgreSQL integration tests. AUTH-04, AUTH-05 and AUTH-06
+passed their dedicated integration tests. The remaining acceptance checks
+are partially verified, implementation-reviewed, or not separately tested.
+See
+[`BUILD_AND_TEST_STATUS_2026-11-09.md`](../implementation/BUILD_AND_TEST_STATUS_2026-11-09.md)
+for the evidence and limitations of each check. Do not interpret the overall
+test counts as proof that every AUTH check passed.
+
+**Android restart behavior:** The app creates an in-memory `CookieManager`
+and opens the sign-in screen when its activity starts. After a full app
+process restart, the student signs in again. Persistent session storage is
+not part of the current MVP and has not been added.
+
+
+**Scope note:** Keep the existing session, cookie and origin behavior unless a core MVP test shows that it prevents the intended demo workflow. Do not introduce a CSRF library or another authentication dependency by default. Make only the smallest change needed to fix a demonstrated problem. This is an academic demonstration approach, not a production security certification.
 
 **TTL qualification:** The current default is 8 hours. Keep it as the pilot default for now, but explicitly confirm that it is suitable for the academic demonstration. It is a technical session setting, not an institutional policy.
 
-### 3.5 Proposed decision-record wording
+### 3.5 Established decision wording
 
 > For the academic MVP, use opaque server-managed sessions shared by the web and Android clients. The backend generates a cryptographically random session identifier, stores only its digest in PostgreSQL, and sends the identifier through an HttpOnly cookie. Protected requests validate session existence, expiry and account activity, then independently enforce current role and assignment/scope authorization. Logout invalidates the server-side session. Argon2id password hashing remains governed separately by TD-006. This decision applies to the academic MVP and does not claim production security certification.
 
-**Do not copy this wording into `docs/decisions.md` as ESTABLISHED until the owner/team accepts it and the AUTH checks are reviewed.**
+**Decision recorded:** This owner-approved approach is already entered in the established decisions section of `docs/decisions.md`. The AUTH checks remain implementation-verification work. Approval does not mean that unrun tests have passed.
 
 ## 4. TD-R09 — Historical configuration and assignment preservation
 
@@ -294,7 +311,7 @@ This is a logical model, not final SQL. Entity attributes and relationships are 
 | ClearanceRequest | Student-specific request/assignment for a template and period | Existing duplicate guard uses student/template/period uniqueness. |
 | ClearanceRequirementRecord | One student-specific requirement instance and its status | Should carry or reference the resolved historical configuration/responsibility context selected under TD-R09. |
 | ProcessingHistoryEvent | Append-only decision history: actor, prior/new state, timestamp and remark | Distinct from configuration snapshot and security audit. |
-| AppSession | Opaque server-managed session digest, user, expiry and creation time | Current implementation; TD-R01 proposed approval pending. |
+| AppSession | Opaque server-managed session digest, user, expiry and creation time | Current implementation; approach owner-established for the academic MVP. Functional verification remains tracked in §3.4. |
 | AuditEvent (if needed by MVP scope) | Security/admin events distinct from processing decisions | Define the event set and redaction; do not duplicate the processing history without a purpose. |
 
 ### 6.1 Important relationship rules
@@ -400,7 +417,7 @@ P2 is complete only when the following artifacts are reviewed and either accepte
 
 | P2 output | Minimum completion evidence |
 |---|---|
-| TD-R01 decision | Session/token trade-off, owner/team choice, documented cookie/session behavior, AUTH test plan and recorded decision status. |
+| TD-R01 decision | Owner-selected session approach recorded; session behavior and focused functional verification checks documented, with test status tracked separately. |
 | TD-R09 decision | Required observable history, chosen mechanism, field list, retirement/correction behavior, HIST acceptance tests and recorded decision status. |
 | Role/permission matrix | Six baseline role values, approved/conditional/open cells, admin non-approval principle, instructor and office scope, multi-role policy left open unless resolved. |
 | Logical data model | Entities, relationships, responsibility model, institution/college context, student-classification catalog/profile reference, academic-year/semester representation, historical context and persisted-versus-derived status rules. |
@@ -409,7 +426,7 @@ P2 is complete only when the following artifacts are reviewed and either accepte
 | Migration/seed approach | Selected or explicitly deferred TD-R11 tooling; safe fictional seed/reset strategy. |
 | Team alignment | Backend, web and Android contributors understand the same shared contract and unresolved items. |
 
-Do not keep P2 open indefinitely. The approved plan time-boxes P2 to up to two working days. If TD-R01 or TD-R09 cannot be responsibly closed in that window, record the specific blocker and defer only the dependent production work, while continuing independent safe work such as mock screens or non-schema setup. Begin/continue the narrow end-to-end path promptly; do not require every future requirement to be fully designed first.
+Do not keep P2 open indefinitely. The approved plan time-boxes P2 to up to two working days. If TD-R09 cannot be resolved within that timebox, record the specific blocker and defer only the dependent history/schema work. Continue independent work such as mock screens or non-schema setup, and proceed with the narrow end-to-end MVP path. TD-R01 is already established; its AUTH checks are implementation verification and must not block the selected authentication approach.
 
 ## 10. Explicit non-goals for this P2 package
 
@@ -428,14 +445,13 @@ These ideas remain in the separate proposal reconciliation/future reference and 
 
 ## 11. Owner/team decisions still required
 
-1. Accept or reject the TD-R01 server-managed session recommendation after the AUTH verification review.
-2. Accept, revise or reject the TD-R09 hybrid candidate after reviewing the actual field-level logical model and HIST tests.
-3. Review whether to accept TD-R07's fixed per-role permission mapping for the MVP. If not decided within P2, keep it RECOMMENDED/PROVISIONAL/UNDECIDED and specify only the minimum backend authorization needed for the next slice; do not mark it established by this package.
-4. Agree on the simplest replaceable instructor assignment for the fictional MVP while IR-003 remains conditional.
-5. Decide the minimum academic data dimensions needed for the current demo without violating AS-010.
-6. Select/defer any TD-R11 tools needed for migrations, input validation, tests and client networking.
+1. Accept, revise or reject the TD-R09 hybrid candidate after reviewing the actual field-level logical model and HIST tests.
+2. Review whether to accept TD-R07's fixed per-role permission mapping for the MVP. If not decided within P2, keep it RECOMMENDED/PROVISIONAL/UNDECIDED and specify only the minimum backend authorization needed for the next slice; do not mark it established by this package.
+3. Agree on the simplest replaceable instructor assignment for the fictional MVP while IR-003 remains conditional.
+4. Decide the minimum academic data dimensions needed for the current demo without violating AS-010.
+5. Select/defer any TD-R11 tools needed for migrations, input validation, tests and client networking.
 
-No item above is marked approved by this document.
+The remaining items above are not established by this document. TD-R01 is recorded separately as owner-established in `docs/decisions.md`.
 
 ---
 
@@ -443,7 +459,7 @@ No item above is marked approved by this document.
 
 Project files to review alongside this package:
 
-- `docs/decisions.md` — TD-001–TD-021 and open/recommended technical decisions.
+- `docs/decisions.md` — established technical decisions, including TD-R01, and remaining open/recommended decisions.
 - `docs/requirements/roles-permissions.md` — RP-001–RP-006 and RP-I01–RP-I07.
 - `docs/requirements/instructor-responsibilities.md` — IR-001–IR-004 and IR-I01–IR-I05.
 - `docs/requirements/clearance-requirements.md` — CR-001–CR-010 and CR-I01–CR-I06.
@@ -451,6 +467,7 @@ Project files to review alongside this package:
 - `docs/requirements/records-and-history.md` — RH-001–RH-009.
 - `docs/implementation/First-Slice_Technical_Contract_Draft_0.3.md` — first-slice API, authorization, state transitions and test inventory.
 - `docs/implementation/FIRST_SLICE_IMPLEMENTATION_PILOT.md` — current implementation evidence and limitations.
+- `docs/implementation/BUILD_AND_TEST_STATUS_2026-11-09.md` — owner-run authentication/session verification results and outstanding checks.
 - `docs/planning/CDCMS_MVP_Scope_Decision_and_Team_Execution_Plan_v0.3.md` — P2 exit criteria and P3/P4 work.
 - `docs/mvp/CDCMS_MVP_Requirements_Specification_v0.3.md` — approved MVP scope and acceptance criteria.
 - `docs/mvp/CDCMS_MVP_Traceability_Crosswalk_and_Issue_Register_v0.3.md` — baseline/MVP traceability and open issue register.
