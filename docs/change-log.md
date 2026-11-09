@@ -21,6 +21,17 @@ Rules: IDs are never reused. When a requirement is removed, its row is deleted f
 
 ## Entries
 
+### CHG-004 · 2026-11-09 · Establish server-managed sessions for the academic MVP
+- Changed information: TD-R01 in `docs/decisions.md`; P2 technical design package status and authentication section; documentation index.
+- Previous value: TD-R01 was listed as OPEN / UNKNOWN / UNDECIDED, asking whether the web and Android clients should use sessions or tokens.
+- New value: The project owner approved opaque, server-managed sessions for the academic MVP. The backend issues random session tokens, stores only their SHA-256 digests, validates session expiry and account activity, checks current authorization on protected requests, and invalidates sessions on logout. Argon2id remains governed separately by TD-006.
+- Reason: Retain the approach already used by the working pilot, avoid unnecessary authentication migration, and prioritize a usable end-to-end MVP over additional infrastructure.
+- Source: Project owner approval, 2026-11-09; SRC-01 §9.
+- Affected components: backend authentication, web and Android session use, functional verification, and project documentation.
+- Implementation consequences: Keep the existing session approach. Verify the essential sign-in, authenticated-request, logout, expiry, account-activity, authorization, browser and Android flows. Fix only demonstrated problems that prevent the approved MVP workflow from working. Do not introduce JWT migration, token-refresh infrastructure, another authentication framework, or optional hardening by default. The approval does not mark unrun tests as passed.
+- Documents updated: `docs/decisions.md`; `docs/planning/P2_Technical_Design_Package_v0.2.md`; `docs/implementation/BUILD_AND_TEST_STATUS_2026-11-09.md`; `docs/development-progress.md`; `docs/README.md`; `docs/change-log.md`.
+- Checklist updated: not applicable; Requirements Baseline 0.1 and owner-approved MVP v0.3 remain unchanged. Functional verification remains separate.
+
 ### CHG-003 · 2026-11-08 · Choose a simple password for fictional local demo accounts
 - Changed information: local demo account credential convention and its supporting documentation; no baseline requirement or institutional policy changed.
 - Previous value: the example configuration used the earlier documented demo password, and the reset utility required at least 12 characters.

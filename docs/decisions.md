@@ -1,6 +1,6 @@
 # Technical Decisions (TD)
 
-Prefix `TD` · Baseline 0.1 · Last reviewed 2026-11-08
+Prefix `TD` · Baseline 0.1 · Last reviewed 2026-11-09
 Conventions: [requirements/README.md](requirements/README.md). Change history: [change-log.md](change-log.md).
 
 The `TD` and `TD-R` prefixes preserve the identifiers originally assigned to technical decisions and recommendations; the prefix does not determine the row's current section or decision basis. Section placement and the Decision basis field determine its current status. IDs are never reused or renumbered.
@@ -40,6 +40,7 @@ SRC-01 §2 calls these the *initial* technology choices and requires their compa
 | TD-019 | Track project work in `docs/development-progress.md` using `Suggested`, `In Progress`, `Implemented`, `Verified`, and `Blocked`. A status of `Verified` requires recorded evidence. | ESTABLISHED | CONFIRMED | REQUIRED | SRC-14 | 2026-11-05 | The progress model must explain the baseline's existing decision basis, information status, requirement class, and form checklist markers without redefining them. |
 | TD-020 | Before the repository is made public, complete and record a publication-safety review of current repository contents and the full reachable Git history. Review institutional permission, ownership/licensing, example names, confidential material, personal data, secrets, local configuration, commit metadata, issue/PR templates, default-branch settings, workflows/logs/artifacts, and public access. | ESTABLISHED | CONFIRMED | REQUIRED | SRC-14 | 2026-11-05 | Mandatory publication-safety gate paired with TD-015. The repository is already public; the full review was not completed before the first push. A limited follow-up review on 2026-11-08 removed machine-specific hardware/storage details from the initial commit and recorded the selected scan results in [`reviews/PUBLICATION_REVIEW_2026-11-08.md`](reviews/PUBLICATION_REVIEW_2026-11-08.md). **TD-020 remains in progress, not verified**: school rules, all files/history, and GitHub settings/metadata still need review. |
 | TD-021 | Use `docs/README.md` as the overall project documentation index. Preserve `docs/requirements/README.md` as the index and usage guide for the modular requirements baseline. Do not create a separate `documentation-index.md` that duplicates either index. | ESTABLISHED | CONFIRMED | REQUIRED | SRC-14 | 2026-11-05 | The overall index should link to documents as they are actually created; do not create empty placeholder documents merely to fill the index. |
+| TD-R01 | Authentication mechanism shared by Android and web for the academic MVP: opaque server-managed sessions. The backend issues random session tokens, stores only their SHA-256 digests, validates session expiry and account activity, checks current authorization on protected requests, and invalidates sessions on logout. | ESTABLISHED | CONFIRMED | REQUIRED | SRC-01 §9; project owner approval (2026-11-09) | 2026-11-09 | Owner-approved for the academic MVP. AUTH verification is tracked separately and is not implied to have passed. Argon2id remains governed by TD-006. |
 
 ## 2. Suggested or recommended, not decided
 
@@ -59,7 +60,6 @@ SRC-01 §2 calls these the *initial* technology choices and requires their compa
 
 | ID | Decision | Decision basis | Info status | Class | Source | Updated | Notes |
 |---|---|---|---|---|---|---|---|
-| TD-R01 | Authentication mechanism shared by Android and web: session-based or token-based. | OPEN | UNKNOWN | UNDECIDED | SRC-01 §9 | 2026-11-04 | The brief requires the trade-offs to be explained to the team before implementation. Not yet done. |
 | TD-R09 | How template-versus-record separation preserves history (copy the template into each record at assignment, version the templates, or another method). | OPEN | UNKNOWN | UNDECIDED | SRC-01 §8; SRC-04 rule 6 | 2026-11-04 | Chosen at database design. Must satisfy RH-001 to RH-003. |
 | TD-R11 | Additional libraries and tools: input validation, database migrations, query layer or ORM, session or token handling, testing, Android networking and JSON, React routing and state. | OPEN | UNKNOWN | UNDECIDED | SRC-01 §2 | 2026-11-04 | None selected. Each addition must pass TD-010. |
 | TD-R13 | Which Node.js version manager and operating mode do the two Windows developers use, and does each configuration resolve the agreed project version file correctly? | OPEN | UNKNOWN | UNDECIDED | SRC-11 | 2026-11-05 | Official NVM for Windows documentation confirms that shim mode can auto-detect `.nvmrc`, `.node-version`, and `package.json`; auto-use must be enabled. Link mode does not provide the same automatic version detection. Verify each teammate's installed version, mode, configuration, and actual resolution. |
