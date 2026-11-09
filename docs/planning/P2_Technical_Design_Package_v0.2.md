@@ -3,10 +3,10 @@
 **Document ID:** CDCMS-P2-DESIGN-001<br>
 **Version:** 0.2<br>
 **Prepared:** 2026-11-09<br>
-**Status:** Working technical design reference; TD-R01 is owner-established for the academic MVP; remaining P2 items retain their recorded open or provisional status.<br>
+**Status:** Working technical design reference; TD-R01 and TD-R09 are owner-established for the academic MVP; remaining P2 items retain their recorded open or provisional status.<br>
 **Scope:** P2 data model, permissions, authentication, API contract and history design
 
-> **Authority notice:** This document is a technical planning aid. It does not amend Requirements Baseline 0.1 or replace the owner-approved MVP Specification v0.3. TD-R01 is established separately by the project owner and recorded in `docs/decisions.md`. This document does not establish TD-R07, TD-R09, or any other remaining open or provisional decision. The implementation team retains ownership of production code.
+> **Authority notice:** This document is a technical planning aid. It does not amend Requirements Baseline 0.1 or replace the owner-approved MVP Specification v0.3. TD-R01 and TD-R09 are established separately by the project owner and recorded in `docs/decisions.md`. This document does not establish TD-R07 or any other remaining open or provisional decision. The implementation team retains ownership of production code.
 
 ---
 
@@ -141,97 +141,100 @@ not part of the current MVP and has not been added.
 
 ## 4. TD-R09 — Historical configuration and assignment preservation
 
-**Current decision-register status:** OPEN / UNKNOWN / UNDECIDED.<br>
-**Required behavior:** RH-001 to RH-003 are CONFIRMED/REQUIRED; RH-004 to RH-007 retain their recorded provisional qualifications.<br>
-**Recommended direction:** A limited hybrid of immutable/versioned configuration and assignment-time snapshots of resolved values.<br>
-**Owner approval:** Not yet recorded.
+**Current decision-register status:** ESTABLISHED / CONFIRMED / REQUIRED (owner-approved 2026-11-09; see `docs/decisions.md` and CHG-005).<br>
+**Selected approach:** Assignment-time snapshots of effective configuration and responsibility values, with stable source references; processing history remains separate and append-only.<br>
+**Owner approval:** Recorded on 2026-11-09. Full configuration versioning, a separate assignment-history table, and retroactive correction/reassignment are not approved by this decision.
 
-### 4.1 Required behavior, independent of the technical method
+### 4.1 Required behavior
 
-A historical clearance record must remain understandable after later changes to templates, academic configuration or approval assignments. At a minimum, an authorized viewer must be able to establish:
+RH-001 to RH-003 require an existing student-specific clearance record to remain understandable after later changes to a reusable requirement, academic configuration or approval responsibility. RH-004 to RH-007 retain their existing status and qualifications in Requirements Baseline 0.1; this decision selects the snapshot mechanism but does not resolve those separate policy questions. In particular, it does not authorize a retroactive correction or reassignment capability. At minimum, an authorized viewer must be able to establish:
 
-- which requirement applied to the student at the time of assignment;
-- the relevant requirement code, name and description/instructions;
-- whether it was mandatory or optional;
-- the applicable program/academic context used at assignment;
-- which office or instructor was responsible at the relevant time; other authorized parties only where CR-004 and the applicable institutional decision permit them;
-- the actual decision, actor, timestamp and remark;
-- the source template/configuration identity or version, where retained.
+- which requirement was assigned, including its code and name;
+- whether it was mandatory or optional and which rejection-remark policy applied;
+- the student-program and applicable-program context used when the requirement was assigned;
+- which office was responsible at assignment, including the office identity and display label as they then existed;
+- the actual decision, actor, timestamp and remark from the separate processing history;
+- which source template, template-requirement, requirement definition, academic period and office generated the assignment, using retained source identifiers.
 
-Changing a current reusable definition must not silently change the meaning of an already-created student record. Keep processing history and configuration history separate but linkable.
+Later edits to reusable configuration must not silently change the meaning or displayed historical context of an existing record. Historical reads must use the stored snapshots; the current active/inactive state of a source configuration row must govern future assignment, not whether an old record can be read.
 
-### 4.2 Current implementation gap
+**Instructor boundary:** Instructor processing remains required by IR-001/IR-002/IR-004, but the instructor-to-student responsibility source remains conditional under IR-003. This TD-R09 decision snapshots the current office-based responsibility model. It does not approve instructor assignment fields or an instructor-assignment workflow. If IR-003 is later resolved to include instructor responsibility, the effective instructor identity and display context must also be preserved for the affected assignment.
 
-The current schema stores references from clearance requests and requirement records to template and template-requirement configuration rows. It also stores `office_id` on the requirement record and writes decision history separately.
+### 4.2 Current implementation gap and migration constraint
 
-This preserves useful identifiers and processing events, but the record does not contain a complete copy of the effective requirement text, mandatory setting, rejection-remark rule, resolved applicability context and responsibility label. Existing queries join to current configuration and currently filter some linked configuration rows by active status. A later edit/deactivation could therefore change or hide how an old record is rendered.
+The current schema retains `template_id` and `academic_period_id` on `clearance_requests`, and `template_requirement_id` and `office_id` on `clearance_requirement_records`. The requirement definition is currently reached through `template_requirements`; the student program is reached through the mutable student profile. Decision events are stored separately in `processing_history_events`, with database protections against update, delete and truncate.
 
-This is a design gap to close before admin editing is implemented. It is not a claim that the current seeded first slice is unusable.
+The request and requirement records do not yet contain the complete effective display and policy values. Current read and decision queries use live configuration joins, and some historical reads apply active-state filters. A later rename, policy change, program change, office change or deactivation can therefore alter or hide the context shown for an older record.
 
-### 4.3 Options
+The implementation must add the snapshots described in §4.5, populate them when assignments are created, backfill existing development records, and update historical reads and decision validation to use the stored values. The backfill can copy only the values currently found through each existing record's linked configuration. It cannot reconstruct any earlier value that may already have been changed before the snapshot was introduced. Treat pre-backfill history as verified only to the extent supported by existing evidence; do not claim that the backfill recovers unavailable historical states.
 
-| Option | Method | Strength | Cost/risk |
-|---|---|---|---|
-| A. Assignment-time snapshots only | Copy effective requirement/configuration/responsibility fields onto each generated student requirement record. | Easy to understand; historical display does not depend on live mutable definitions. | Repeats values; must choose exactly which fields are copied and keep source references for traceability. |
-| B. Immutable versioned configuration | Never edit a configuration version after use. Create a new version/row for future assignments; existing records reference the old version. | Strong provenance and less per-record duplication. | Requires version lifecycle, immutable-row rules, and old-version read support across every relevant query. |
-| C. Hybrid (recommended candidate) | Retain source IDs/version references, freeze or version used configuration, and snapshot the resolved student-specific values and responsible party on assignment. | Balances traceability, historical readability and implementation simplicity. | Requires a deliberate field list and careful migration/read-query changes. |
-| D. Freeze existing configuration without versioning | Disallow editing any configuration once used; administrators must create new definitions/templates for any change. | Lowest initial schema complexity. | Becomes awkward without an explicit version/family convention; accidental edits through SQL remain possible unless guarded. |
+`backend/src/migrate.js` currently applies the guarded development `schema.sql`; it does not track or apply an ordered, versioned migration history. Implement snapshot columns and backfill steps so repeated schema application does not overwrite already-populated snapshot values. Selection of any dedicated migration tool remains separate under TD-R11.
 
-### 4.4 Recommendation
+### 4.3 Selected method and rejected alternatives
 
-Evaluate Option C as the leading candidate, but approve it only after a field-level logical model and acceptance tests confirm it is the smallest design that satisfies RH-001 to RH-007.
+Use **assignment-time snapshots with retained source references**. The existing reusable configuration remains the source for future assignments. During the assignment transaction, the backend copies the effective values needed to interpret the new student-specific request and requirement records. Later configuration edits affect future assignments only; historical reads use the copied values.
 
-The candidate design should:
+This is the smallest approach that fits the existing workflow. It avoids requiring administrators and application queries to manage immutable configuration versions and avoids creating a separate assignment-history table solely to preserve values already captured on the request and requirement records.
 
-1. Keep stable source references to the template, template-requirement and requirement definition.
-2. Capture the effective requirement code/name/description or instructions when a student-specific requirement is generated.
-3. Capture mandatory status and the rejection-remark setting applicable to that generated record.
-4. Capture the resolved applicability context needed to explain why the requirement was assigned (for the current MVP, this should remain limited to approved simple dimensions such as program).
-5. Capture the responsible party for the record: office or instructor, with stable identifier and the display name/label as it applied at assignment.
-6. Record assignment time and source configuration/version identifiers.
-7. Retire or deactivate old configuration for future assignment without making historical student records disappear from history views.
-8. Keep existing decision history append-only.
-9. If a correction to an existing assignment is ever supported, represent it as an explicit, authorized and logged correction/reassignment rather than silently overwriting the old context. RH-004's permission for retroactive changes remains undecided.
+The following alternatives are not selected for this MVP decision:
 
-**Instructor scope boundary:** Instructor processing itself is required by IR-001, IR-002 and IR-004. Only the assignment source/method under IR-003 remains conditional. The MVP may use a simple, explicit, replaceable instructor assignment for fictional demo records; it must not require subject/section/enrollment integration without institutional evidence.
-
-**Do not mandate a dedicated assignment-history table at this stage.** A snapshot, immutable assignment version, event table or combination may meet the requirement. Choose the smallest mechanism that preserves the required observable history.
-
-### 4.5 Candidate snapshot field groups
-
-These are logical field groups, not approved SQL columns or final schema names.
-
-| Group | Candidate values to preserve | Reason |
+| Alternative | Status | Reason not selected |
 |---|---|---|
-| Source identity | Template ID/version; template-requirement ID/version; requirement-definition ID/version | Trace back to the configuration that generated the record. |
-| Display meaning | Requirement code, name, description/instructions | Preserve what the student was asked to satisfy. |
-| Completion treatment | Mandatory flag; applicable rejection-remark policy | Preserve the rules applied to this record. |
-| Applicability context | Student program and any other approved applicability values used at assignment; classification only if the selected rule actually uses it | Explain why this requirement applied. Classification is configurable data, but its effect on applicability remains conditional under SC-003. Do not add unapproved dimensions. |
-| Responsibility | Responsible party type or types, stable office/instructor identifier(s), and display snapshot(s) | Preserve who was responsible at the relevant time. Other authorized parties require the applicable baseline condition/decision; the physical representation depends on CR-I02 and IR-003. |
-| Assignment metadata | Assigned/created timestamp; actor or system source if relevant | Establish when and how the record was generated. |
-| Decision history | Previous/new status, actor, timestamp, remark | Already represented in processing history; keep this separate from configuration snapshot. |
+| Immutable/versioned configuration | Not selected | Adds a version lifecycle and version-aware reads across configuration and history without being necessary for the approved snapshot behavior. |
+| Hybrid versioning plus snapshots | Not selected | Adds the cost of both mechanisms; no current evidence justifies that additional complexity. |
+| Freeze all configuration once used | Not selected | Restricts ordinary future maintenance and still needs a clear process for creating changed future configuration. |
 
-Do not duplicate every student profile field into each requirement record. Snapshot only the values needed to preserve the meaning and responsibility of that requirement, and explain any broader record-level context separately.
+Retain source IDs for traceability, but do not treat a source ID as a substitute for preserving its former display or policy values. Keep referenced source rows rather than deleting them; deactivate/retire them so they are not used for new assignments. Do not add a retroactive correction or reassignment operation. Any future proposal for that capability requires a separate owner decision and an explicit, auditable design.
+
+### 4.4 Snapshot ownership and read rules
+
+- Request-wide context belongs on `clearance_requests`: the template, academic period and student's program as resolved when the request is generated.
+- Requirement-specific context belongs on each `clearance_requirement_records` row: the requirement definition, its template inclusion/policy, applicable-program rule and resolved responsible office.
+- Keep the existing foreign-key source references. Add a direct requirement-definition reference to the requirement record so later edits to the template-requirement association cannot change which definition the historical record identifies.
+- New assignment logic must write the source references and corresponding snapshot values in the same database transaction.
+- Historical student/staff list and detail queries must display snapshot values and must not require linked configuration rows to remain active.
+- Decision validation must use the rejection-remark policy snapshot belonging to the record, not the current mutable template-requirement row.
+- Current active configuration is still checked when creating future assignments. Snapshotting does not make retired configuration eligible for new assignments.
+- Do not update snapshot values when a source configuration row is edited. The normal application workflow must provide no silent path to rewrite an existing snapshot.
+
+### 4.5 Logical snapshot field groups
+
+The following is the minimum logical field mapping for the current schema. It guides the implementation; it is not a claim that the SQL columns or migration have already been added.
+
+| Record | Preserve at assignment | Existing source references to retain / interpretation |
+|---|---|---|
+| `clearance_requests` | Template code and name; academic-period code and label; student's program ID, code and name as they were at assignment. | Keep existing `student_profile_id`, `template_id` and `academic_period_id`. The program snapshot preserves the program used by the assignment process even if the student's current profile later changes. |
+| `clearance_requirement_records` | Requirement code and name; mandatory/optional setting; rejection-remark policy; applicable-program ID/code/name when restricted to one program; responsible office code and name. | Keep existing `template_requirement_id` and `office_id`; add a direct `requirement_definition_id` source reference. A null applicable-program snapshot means the template requirement applied to all programs. |
+| `processing_history_events` | No new configuration snapshot fields. | Keep its existing actor, previous/new status, timestamp and remark. It remains separate and append-only. |
+
+For the current model, `requirement_definitions` has code/name and an `office_id`; `template_requirements` has the mandatory flag, rejection-remark policy and optional `applicable_program_id`. There is no requirement description/instructions column in the current schema. Do not add a description field or snapshot absent text as part of TD-R09. If a description/instructions field is separately justified and approved later, its effective value must be snapshotted too.
+
+Do not duplicate every student-profile field. Do not snapshot classification, department, section, subject, enrollment or other dimensions unless an approved applicability rule actually uses them. Do not add instructor snapshot columns until IR-003 establishes the responsibility source and required representation. Do not add assignment-actor history or a separate assignment-history table through this decision; the existing request/record creation timestamps identify assignment time.
 
 ### 4.6 TD-R09 acceptance tests
 
+**Test setup constraint:** `clearance_requests` has a uniqueness constraint on `(student_profile_id, template_id, academic_period_id)`. Tests that verify changed configuration on a future assignment must use a distinct eligible assignment context, such as another student or academic period. They must not bypass the duplicate guard or create a second request for the same tuple. HIST-09 separately verifies that concurrent duplicate assignment remains prevented.
+
 | ID | Scenario | Expected result |
 |---|---|---|
-| HIST-01 | Create a student requirement, then rename the reusable requirement. | Existing record still displays the original assigned name; a new assignment uses the new name/version. |
-| HIST-02 | Change a requirement description/instructions. | Existing record retains the old effective text; new assignments use the updated version. |
-| HIST-03 | Change mandatory to optional or vice versa. | Existing record retains its assigned setting; new records use the new setting. |
-| HIST-04 | Change rejection-remark policy. | Existing record uses the policy assigned to it; new records use the new policy. |
-| HIST-05 | Change the responsible office/instructor for future assignments. | Existing record preserves its historical responsible party; future assignments use the new responsibility. |
-| HIST-06 | Retire old template/definition/office/instructor assignment. | Old records remain readable to currently authorized viewers; retired data is excluded from new assignment. |
-| HIST-07 | Read decision history after configuration change. | Actor, old/new status, decision time and remark remain unchanged and available. |
-| HIST-08 | Attempt a silent retroactive edit to an existing record. | Rejected or routed through an explicitly approved, logged correction mechanism; no silent history rewrite. |
-| HIST-09 | Generate two assignments concurrently for the same student/template/period. | Existing duplicate guard continues to ensure only one request/one set of requirement records. |
+| HIST-01 | Create a student requirement, then rename the reusable requirement definition. | Existing record continues to display the assigned code/name; a new assignment captures the changed code/name. |
+| HIST-02 | Inspect the requirement description/instructions snapshot scope. | The current schema has no such field. No description/instructions field is invented or added by TD-R09; if one is separately approved later, its effective value must be snapshotted. |
+| HIST-03 | Change a template requirement from mandatory to optional or vice versa. | Existing record retains its assigned setting; a new assignment captures the current setting. |
+| HIST-04 | Change the rejection-remark policy for future assignments. | Existing record continues to enforce its assigned policy; a new record uses the current policy. |
+| HIST-05 | Change the responsible office on a reusable requirement for future assignments. | Existing record retains the original office ID/code/name; a future assignment captures the new office context. Instructor responsibility is excluded until IR-003 is separately resolved. |
+| HIST-06 | Deactivate/retire a template, requirement definition, program or office used by an old record. | Old records remain readable to authorized viewers using snapshots; inactive configuration is excluded from new assignments. Referenced source rows are not deleted. |
+| HIST-07 | Read decision history after source configuration changes. | Actor, previous/new status, decision time and remark remain unchanged and available from append-only processing history. |
+| HIST-08 | Attempt to change historical snapshot values through an ordinary application operation. | No normal application operation silently changes snapshots; no retroactive correction/reassignment operation is exposed by this decision. Any future correction capability requires separate approval and an auditable design. |
+| HIST-09 | Generate two assignments concurrently for the same student/template/period. | The existing duplicate guard continues to ensure only one request and one set of requirement records. |
+| HIST-10 | Change a template requirement to reference a different requirement definition after an existing record was assigned. | The existing record retains its original definition ID/code/name; a future assignment captures the new definition and its values. |
+| HIST-11 | Rename a template or academic period after a request was assigned. | The existing request retains the assignment-time template and period code/name/label; a subsequent eligible request captures the current values. |
+| HIST-12 | Change the student's program or a template requirement's applicable-program rule after assignment. | The existing request and requirement retain the assignment-time student-program and applicability context; future assignments use and capture the current values.
 
-### 4.7 Proposed decision-record wording
+### 4.7 Established decision wording
 
-> The MVP must preserve the effective requirement configuration and responsibility context associated with each student-specific clearance requirement at the time of assignment. Later changes to reusable definitions, templates, academic configuration or responsibility assignments must not silently rewrite existing clearance records. Historical decision events remain append-only and linkable to the requirement record. The technical design may use assignment-time snapshots, immutable/versioned configuration or a justified combination, selected after field-level modeling and acceptance-test review. Referenced configuration is retired rather than deleted while required for historical interpretation. Any intentional retroactive correction requires a separately approved and logged process; it is not enabled by default.
+> For the MVP, preserve the effective requirement configuration and office responsibility context associated with each student-specific clearance request and requirement record through assignment-time snapshots, while retaining stable references to their source configuration. Capture request-level template, academic-period and student-program context, and requirement-level definition/display, mandatory treatment, rejection-remark policy, applicable-program context and responsible-office identity/display. Later changes to reusable configuration must not silently rewrite existing snapshots. Historical reads use snapshot values; active configuration governs future assignments. Processing decision events remain separate and append-only. Do not introduce full configuration versioning, a separate assignment-history table, or a retroactive correction/reassignment feature through this decision. Instructor responsibility remains subject to IR-003.
 
-**Do not copy this wording into `docs/decisions.md` as ESTABLISHED until the owner/team approves the mechanism and field list.**
+The decision is established. Implementation, data backfill, query changes and HIST acceptance-test results remain separate work and must not be marked verified until evidence is recorded.
 
 ## 5. Role and permission matrix — P2 working draft
 
@@ -284,7 +287,7 @@ The existing schema supports multiple role-assignment rows for one user. RP-I03 
 
 ## 6. Logical data model — minimum entities and responsibilities
 
-This is a logical model, not final SQL. Entity attributes and relationships are subject to TD-R09, TD-R07, CR-005/006, AS-009 and IR-003. Avoid adding full SIS entities unless needed by an approved clearance rule.
+This is a logical model, not final SQL. The historical snapshot fields follow established TD-R09; other entity attributes and relationships remain subject to TD-R07, CR-005/006, AS-009 and IR-003. Avoid adding full SIS entities unless needed by an approved clearance rule.
 
 | Entity/concept | Purpose | Important relationships / notes |
 |---|---|---|
@@ -304,12 +307,12 @@ This is a logical model, not final SQL. Entity attributes and relationships are 
 | YearLevel (conditional use) | Configurable year-level values if a confirmed applicability rule or required student record uses them | Do not hardcode year-level labels. Include only as far as the MVP applicability/record model needs them under AS-004, AS-007 and AS-008. |
 | Office | Administrative unit that owns requirements | Referenced by requirement configuration and responsibility records. |
 | OfficeAssignment | Links office personnel to office scope | Historical validity must satisfy RH-003; current boolean-active model is not the complete history solution. |
-| RequirementDefinition | Reusable requirement identity, code, name, description | Must not be destructively edited in a way that rewrites old records. |
+| RequirementDefinition | Reusable requirement identity, code and name | The current schema has no description/instructions field. Any such field must be separately justified and approved; its effective value must then be preserved under TD-R09. |
 | ClearanceTemplate | Reusable requirement set for an academic period/target group | Kept distinct from student records under CR-002. |
-| TemplateRequirement | Inclusion of a definition in a template, mandatory flag, simple applicability and rejection-remark policy | Current schema already has core fields. The ownership location for responsible office/instructor remains a design decision under CR-003/CR-I02, IR-003 and TD-R09; do not assume it belongs here. |
+| TemplateRequirement | Inclusion of a definition in a template, mandatory flag, simple applicability and rejection-remark policy | Current schema already has core fields. The current office source is `requirement_definitions.office_id` and its effective office is snapshotted on the requirement record under TD-R09. Instructor responsibility remains conditional under CR-003/CR-I02 and IR-003; do not add it by assumption. |
 | ResponsibilityAssignment | Identifies the responsible office or instructor for an assigned requirement; other authorized parties only if separately approved | The exact instructor assignment source is conditional under IR-003. For the fictional demo, use a simple explicit and replaceable assignment. Do not assume multiple signatories or a universal one-to-one rule until CR-I02 and the selected IR-003 approach justify the cardinality. |
 | ClearanceRequest | Student-specific request/assignment for a template and period | Existing duplicate guard uses student/template/period uniqueness. |
-| ClearanceRequirementRecord | One student-specific requirement instance and its status | Should carry or reference the resolved historical configuration/responsibility context selected under TD-R09. |
+| ClearanceRequirementRecord | One student-specific requirement instance and its status | Carries the requirement-level snapshot values and stable source references defined by established TD-R09. |
 | ProcessingHistoryEvent | Append-only decision history: actor, prior/new state, timestamp and remark | Distinct from configuration snapshot and security audit. |
 | AppSession | Opaque server-managed session digest, user, expiry and creation time | Current implementation; approach owner-established for the academic MVP. Functional verification remains tracked in §3.4. |
 | AuditEvent (if needed by MVP scope) | Security/admin events distinct from processing decisions | Define the event set and redaction; do not duplicate the processing history without a purpose. |
@@ -418,7 +421,7 @@ P2 is complete only when the following artifacts are reviewed and either accepte
 | P2 output | Minimum completion evidence |
 |---|---|
 | TD-R01 decision | Owner-selected session approach recorded; session behavior and focused functional verification checks documented, with test status tracked separately. |
-| TD-R09 decision | Required observable history, chosen mechanism, field list, retirement/correction behavior, HIST acceptance tests and recorded decision status. |
+| TD-R09 decision | Owner-established assignment-time snapshot approach; request/requirement field groups; source-reference, retirement and no-retroactive-correction rules; HIST acceptance tests and implementation verification status. |
 | Role/permission matrix | Six baseline role values, approved/conditional/open cells, admin non-approval principle, instructor and office scope, multi-role policy left open unless resolved. |
 | Logical data model | Entities, relationships, responsibility model, institution/college context, student-classification catalog/profile reference, academic-year/semester representation, historical context and persisted-versus-derived status rules. |
 | Academic reference data | Student-classification values are modeled as configurable data (not hardcoded), with the actual institutional list/criteria and effect on applicability kept open. Academic year/semester management is represented without inventing AS-I05 policy. |
@@ -445,7 +448,7 @@ These ideas remain in the separate proposal reconciliation/future reference and 
 
 ## 11. Owner/team decisions still required
 
-1. Accept, revise or reject the TD-R09 hybrid candidate after reviewing the actual field-level logical model and HIST tests.
+1. Review the implementation mapping and migration/backfill plan for the established TD-R09 snapshot model before applying schema changes; no further choice among snapshot/versioning mechanisms is pending.
 2. Review whether to accept TD-R07's fixed per-role permission mapping for the MVP. If not decided within P2, keep it RECOMMENDED/PROVISIONAL/UNDECIDED and specify only the minimum backend authorization needed for the next slice; do not mark it established by this package.
 3. Agree on the simplest replaceable instructor assignment for the fictional MVP while IR-003 remains conditional.
 4. Decide the minimum academic data dimensions needed for the current demo without violating AS-010.
