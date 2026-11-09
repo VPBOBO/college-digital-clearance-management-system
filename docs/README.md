@@ -18,6 +18,7 @@ The original Requirements Baseline 0.1 remains the baseline authority. MVP speci
 - [`mvp/CDCMS_MVP_Requirements_Specification_v0.3.md`](mvp/CDCMS_MVP_Requirements_Specification_v0.3.md) — the working MVP specification.
 - [`mvp/CDCMS_MVP_Traceability_Crosswalk_and_Issue_Register_v0.3.md`](mvp/CDCMS_MVP_Traceability_Crosswalk_and_Issue_Register_v0.3.md) — links MVP features to requirements and tests.
 - [`planning/CDCMS_MVP_Scope_Decision_and_Team_Execution_Plan_v0.3.md`](planning/CDCMS_MVP_Scope_Decision_and_Team_Execution_Plan_v0.3.md) — the planned development stages.
+- [`planning/P2_Technical_Design_Package_v0.1.md`](planning/P2_Technical_Design_Package_v0.1.md) — P2 technical design recommendations, authentication/history decisions, role matrix, logical data model, API outline and acceptance checks. Non-authoritative; decisions remain subject to approval.
 - [`decisions.md`](decisions.md) — technical decisions and questions that are still open.
 - [`change-log.md`](change-log.md) — changes to the requirements and decisions.
 
